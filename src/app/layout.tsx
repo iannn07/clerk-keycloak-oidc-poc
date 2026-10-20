@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Keycloak → Clerk POC',
-  description: 'Login through Keycloak with Clerk as the OIDC identity provider',
+  title: 'Keycloak + Clerk POC',
+  description: 'Login on Keycloak, with Clerk as the user store that checks passwords',
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

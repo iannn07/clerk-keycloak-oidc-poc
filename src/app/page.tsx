@@ -1,12 +1,13 @@
+import { connection } from 'next/server'
 import { Suspense } from 'react'
 import { getSession } from '@/lib/session'
 
 export default function Home() {
   return (
     <main className='mx-auto w-full max-w-3xl p-8 font-sans'>
-      <h1 className='text-2xl font-semibold'>Keycloak → Clerk OIDC POC</h1>
+      <h1 className='text-2xl font-semibold'>Keycloak + Clerk POC</h1>
       <p className='mt-2 text-sm text-zinc-500'>
-        This app only talks to Keycloak. Keycloak brokers the login to Clerk as an OIDC identity provider.
+        This app only talks to Keycloak. Users sign in on Keycloak&apos;s login page, and Clerk checks their passwords.
       </p>
       <Suspense fallback={<p className='mt-6'>Loading session…</p>}>
         <SessionPanel />
@@ -16,6 +17,8 @@ export default function Home() {
 }
 
 async function SessionPanel() {
+  // Unsealing the session checks its expiry against the clock, so it must run per request.
+  await connection()
   const session = await getSession()
 
   if (!session) {
@@ -24,7 +27,7 @@ async function SessionPanel() {
         href='/auth/login'
         className='mt-6 inline-block rounded bg-purple-700 px-4 py-2 font-medium text-white'
       >
-        Sign in with Clerk (via Keycloak)
+        Sign in with Keycloak
       </a>
     )
   }

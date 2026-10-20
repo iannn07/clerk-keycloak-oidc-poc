@@ -1,9 +1,12 @@
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
 import * as client from 'openid-client'
 import { getOidcConfig, redirectUri } from '@/lib/oidc'
 import { setLoginTransaction } from '@/lib/session'
 
 export async function GET() {
+  // Every login needs a fresh state and PKCE verifier, so never prerender this route.
+  await connection()
   const config = await getOidcConfig()
   const codeVerifier = client.randomPKCECodeVerifier()
   const state = client.randomState()
@@ -15,8 +18,8 @@ export async function GET() {
     state,
     code_challenge: await client.calculatePKCECodeChallenge(codeVerifier),
     code_challenge_method: 'S256',
-    // Skip Keycloak's own login form and go straight to the Clerk identity provider.
-    kc_idp_hint: process.env.KEYCLOAK_IDP_HINT!,
+    // Optional: name a Keycloak identity provider to skip Keycloak's own login form.
+    ...(process.env.KEYCLOAK_IDP_HINT && { kc_idp_hint: process.env.KEYCLOAK_IDP_HINT }),
   })
   redirect(url.href)
 }

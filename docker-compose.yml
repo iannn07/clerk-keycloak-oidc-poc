@@ -1,0 +1,28 @@
+# Local Keycloak whose login page checks passwords with Clerk, via the Go clerk-bridge.
+# Values come from .env (see the setup doc). The Next.js app runs on the host with `npm run dev`.
+services:
+  clerk-bridge:
+    build: ./clerk-bridge
+    environment:
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:?set in .env}
+      CLERK_BRIDGE_TOKEN: ${CLERK_BRIDGE_TOKEN:?set in .env}
+    ports:
+      - "127.0.0.1:8090:8090"
+
+  keycloak:
+    build: ./keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:?set in .env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?set in .env}
+      CLERK_BRIDGE_URL: http://clerk-bridge:8090
+      CLERK_BRIDGE_TOKEN: ${CLERK_BRIDGE_TOKEN}
+      # Substituted into realm/clerk-poc-realm.json on first import.
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?set in .env}
+      APP_URL: ${APP_URL:?set in .env}
+    volumes:
+      - ./keycloak/realm:/opt/keycloak/data/import:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - clerk-bridge
