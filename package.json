@@ -9,9 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "iron-session": "^9.0.1",
     "next": "16.4.2",
+    "openid-client": "^6.8.8",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
